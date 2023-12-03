@@ -23,7 +23,7 @@ var masterDataFiles embed.FS
 var localDataFiles embed.FS
 
 func main() {
-	const sqliteFileDir = "~/.term-tasks/db"
+	const sqliteFileDir = "~/.term-tasks/db/"
 	const sqliteFile = sqliteFileDir + "db.sqlite3"
 	// sqliteFileがなかったら作成する
 	if _, err := os.Stat(sqliteFile); os.IsNotExist(err) {
