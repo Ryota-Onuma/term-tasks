@@ -1,4 +1,4 @@
-package admin
+package db
 
 import (
 	"context"
@@ -30,7 +30,8 @@ func (a *admin) DropDB(ctx context.Context) error {
 	if _, err := a.DB().ExecContext(ctx, string(ddl)); err != nil {
 		return err
 	}
-	fmt.Println("Dropped DB!!")
+	fmt.Println("✅ DB dropped.")
+	fmt.Println("")
 	return nil
 }
 
@@ -43,7 +44,8 @@ func (a *admin) MigrateDB(ctx context.Context) error {
 	if _, err := a.DB().ExecContext(ctx, string(ddl)); err != nil {
 		return err
 	}
-	fmt.Println("Migrated DB!!")
+	fmt.Println("✅ DB migrated.")
+	fmt.Println("")
 	return nil
 }
 
@@ -58,8 +60,7 @@ func (a *admin) SeedMasterData(ctx context.Context) error {
 		}
 	}
 
-	fmt.Println("")
-	fmt.Println("Applied master data!!")
+	fmt.Println("✅ Master data applied.")
 	fmt.Println("")
 
 	return nil
@@ -76,8 +77,7 @@ func (a *admin) SeedLocalData(ctx context.Context) error {
 		}
 	}
 
-	fmt.Println("")
-	fmt.Println("Applied local data!!")
+	fmt.Println("✅ Sample data applied.")
 	fmt.Println("")
 
 	return nil
@@ -92,8 +92,7 @@ func (a *admin) Seed(ctx context.Context) error {
 		return err
 	}
 
-	fmt.Println("")
-	fmt.Println("Seed planted!!")
+	fmt.Println("🌱 Seed planted.")
 	fmt.Println("")
 
 	return nil

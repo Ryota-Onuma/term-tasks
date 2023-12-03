@@ -5,11 +5,11 @@ import (
 	"embed"
 	"fmt"
 
-	"github.com/Ryota-Onuma/term-tasks/db/generated/queries"
-	"github.com/Ryota-Onuma/term-tasks/src/cli/admin"
-	"github.com/Ryota-Onuma/term-tasks/src/cli/tasks"
-
 	_ "embed"
+
+	"github.com/Ryota-Onuma/term-tasks/db/generated/queries"
+	"github.com/Ryota-Onuma/term-tasks/src/cli/db"
+	"github.com/Ryota-Onuma/term-tasks/src/cli/tasks"
 
 	c "github.com/urfave/cli/v2"
 )
@@ -39,8 +39,9 @@ func registerApp(db *sql.DB, q *queries.Queries, schemaFiles, masterDataFiles, l
 	return &c.App{
 		Commands: []*c.Command{
 			registerTasks(q),
-			registerAdmin(db, schemaFiles, masterDataFiles, localDataFiles),
+			registerDB(db, schemaFiles, masterDataFiles, localDataFiles),
 			registerVersion(),
+			registerInit(db, schemaFiles, masterDataFiles, localDataFiles),
 		},
 	}
 }
@@ -54,6 +55,19 @@ func registerVersion() *c.Command {
 		Name:   "version",
 		Usage:  "show version",
 		Action: versionFunc,
+	}
+}
+func registerInit(sqlDB *sql.DB, schemaFiles, masterDataFiles, localDataFiles embed.FS) *c.Command {
+	dbAdmin := db.New(sqlDB, schemaFiles, masterDataFiles, localDataFiles)
+	return &c.Command{
+		Name:  "init",
+		Usage: "initialize",
+		Action: func(cCtx *c.Context) error {
+			if err := dbAdmin.Init(cCtx.Context); err != nil {
+				return err
+			}
+			return nil
+		},
 	}
 }
 
@@ -107,62 +121,46 @@ func registerTasks(q *queries.Queries) *c.Command {
 	}
 }
 
-func registerAdmin(db *sql.DB, schemaFiles, masterDataFiles, localDataFiles embed.FS) *c.Command {
-	adminTask := admin.New(db, schemaFiles, masterDataFiles, localDataFiles)
-	var adminResetDB, adminMigrateDB, adminSeed c.ActionFunc
-	adminResetDB = func(cCtx *c.Context) error {
-		if err := adminTask.ResetDB(cCtx.Context); err != nil {
+func registerDB(sqlDB *sql.DB, schemaFiles, masterDataFiles, localDataFiles embed.FS) *c.Command {
+	dbAdmin := db.New(sqlDB, schemaFiles, masterDataFiles, localDataFiles)
+	var resetDB, migrateDB, seed c.ActionFunc
+	resetDB = func(cCtx *c.Context) error {
+		if err := dbAdmin.ResetDB(cCtx.Context); err != nil {
 			return err
 		}
 		return nil
 	}
-	adminMigrateDB = func(cCtx *c.Context) error {
-		if err := adminTask.MigrateDB(cCtx.Context); err != nil {
+	migrateDB = func(cCtx *c.Context) error {
+		if err := dbAdmin.MigrateDB(cCtx.Context); err != nil {
 			return err
 		}
 		return nil
 	}
-	adminSeed = func(cCtx *c.Context) error {
-		if err := adminTask.Seed(cCtx.Context); err != nil {
+	seed = func(cCtx *c.Context) error {
+		if err := dbAdmin.Seed(cCtx.Context); err != nil {
 			return err
 		}
 		return nil
 	}
 
 	return &c.Command{
-		Name:  "admin",
-		Usage: "manage admin tasks",
+		Name:  "db",
+		Usage: "manage db",
 		Subcommands: []*c.Command{
 			{
-				Name:  "db",
-				Usage: "manage database",
-				Subcommands: []*c.Command{
-					{
-						Name:   "reset",
-						Usage:  "reset database",
-						Action: adminResetDB,
-					},
-					{
-						Name:   "migrate",
-						Usage:  "migrate database",
-						Action: adminMigrateDB,
-					},
-					{
-						Name:   "seed",
-						Usage:  "seed database",
-						Action: adminSeed,
-					},
-				},
+				Name:   "reset",
+				Usage:  "reset database",
+				Action: resetDB,
 			},
 			{
-				Name:  "init",
-				Usage: "initialize",
-				Action: func(cCtx *c.Context) error {
-					if err := adminTask.Init(cCtx.Context); err != nil {
-						return err
-					}
-					return nil
-				},
+				Name:   "migrate",
+				Usage:  "migrate database",
+				Action: migrateDB,
+			},
+			{
+				Name:   "seed",
+				Usage:  "seed database",
+				Action: seed,
 			},
 		},
 	}

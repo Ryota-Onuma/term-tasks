@@ -1,11 +1,12 @@
 # Term Tasks - manage your tasks from your terminal app
 
 ## What is Term Tasks ? 
-`Term Tasks` is an app that works from your terminal app, made by @Ryota-Onuma.
+`Term Tasks` is an app that works from your terminal app, made by [@Ryota-Onuma](https://github.com/Ryota-Onuma).
 You can create, list, edit, and delete your tasks with easy ways.
+
 ※ Some of the features, such as delete tasks, remind and attach tags are unavailable. Those convenients will be introduced to this app in the future.
 
-## Used technoliges for development
+## Used technoloiges for development
 - [Go](https://go.dev/)
 - [sqlc](https://sqlc.dev/)
 - [SQLite](https://www.sqlite.org/index.html)
@@ -31,7 +32,7 @@ v0.0.1
 ### 🙏 Initialization
 
 ```sh
-$ term-task admin init
+$ term-task init
 ```
 
 ### 🌱 Apply sample data
@@ -39,7 +40,7 @@ $ term-task admin init
 If you want to try `Term Tasks`, it's recommended to execute this command.
 
 ```sh
-$ term-task admin db seed
+$ term-task db seed
 ```
 
 ### 😭 DB Reset
@@ -47,7 +48,7 @@ $ term-task admin db seed
 ※ All your tasks will be deleted.
 
 ```sh
-$ term-task admin db reset
+$ term-task db reset
 ```
 
 ### ✅ Add your task
@@ -68,10 +69,9 @@ $ term-task tasks edit
 
 Comming soon... 🙏
 
-### 📃 List your tasks
-```sh
-$ term-task tasks list
-```
+### 📃 Check a task
+
+Comming soon... 🙏
 
 ### 🕐 Set a reminder and deadline
 

@@ -1,4 +1,4 @@
-package admin
+package db
 
 import (
 	"context"
@@ -14,10 +14,6 @@ func (a *admin) Init(ctx context.Context) error {
 		return err
 	}
 
-	fmt.Println("")
-	fmt.Println("Applied master data!!")
-	fmt.Println("")
-
-	fmt.Println("Initialization completed!!")
+	fmt.Println("Thanks🙏 Initialization completed.")
 	return nil
 }
