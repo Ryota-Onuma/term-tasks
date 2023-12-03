@@ -154,6 +154,16 @@ func registerAdmin(db *sql.DB, schemaFiles, masterDataFiles, localDataFiles embe
 					},
 				},
 			},
+			{
+				Name:  "init",
+				Usage: "initialize",
+				Action: func(cCtx *c.Context) error {
+					if err := adminTask.Init(cCtx.Context); err != nil {
+						return err
+					}
+					return nil
+				},
+			},
 		},
 	}
 }

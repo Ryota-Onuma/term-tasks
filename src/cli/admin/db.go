@@ -14,10 +14,9 @@ func (a *admin) ResetDB(ctx context.Context) error {
 		return err
 	}
 
-	if err := a.Seed(ctx); err != nil {
+	if err := a.SeedMasterData(ctx); err != nil {
 		return err
 	}
-	fmt.Println("Seed applied!!")
 
 	return nil
 }
@@ -48,33 +47,53 @@ func (a *admin) MigrateDB(ctx context.Context) error {
 	return nil
 }
 
-func (a *admin) Seed(ctx context.Context) error {
+func (a *admin) SeedMasterData(ctx context.Context) error {
 	masterDataSqls, err := a.getMasterDataSqls()
 	if err != nil {
 		return err
 	}
 	for _, sql := range masterDataSqls {
 		if err := a.applySeed(ctx, sql); err != nil {
-			return fmt.Errorf("failed to apply master seed: %w", err)
+			return fmt.Errorf("failed to apply master data: %w", err)
 		}
 	}
 
 	fmt.Println("")
-	fmt.Println("Applied master seed!!")
+	fmt.Println("Applied master data!!")
 	fmt.Println("")
 
+	return nil
+}
+
+func (a *admin) SeedLocalData(ctx context.Context) error {
 	localDataSqls, err := a.getLocalDataSqls()
 	if err != nil {
 		return err
 	}
 	for _, sql := range localDataSqls {
 		if err := a.applySeed(ctx, sql); err != nil {
-			return fmt.Errorf("failed to apply local seed: %w", err)
+			return fmt.Errorf("failed to apply local data: %w", err)
 		}
 	}
 
 	fmt.Println("")
-	fmt.Println("Applied local seed!!")
+	fmt.Println("Applied local data!!")
+	fmt.Println("")
+
+	return nil
+}
+
+func (a *admin) Seed(ctx context.Context) error {
+	if err := a.SeedMasterData(ctx); err != nil {
+		return err
+	}
+
+	if err := a.SeedLocalData(ctx); err != nil {
+		return err
+	}
+
+	fmt.Println("")
+	fmt.Println("Seed planted!!")
 	fmt.Println("")
 
 	return nil

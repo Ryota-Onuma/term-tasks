@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   CONSTRAINT tasks_priority_master_task_priorities_value_fk FOREIGN KEY (priority) REFERENCES master_task_priorities(value)
 );
 
-CREATE TRIGGER set_tasks_updated_at
+CREATE TRIGGER IF NOT EXISTS set_tasks_updated_at
 BEFORE UPDATE ON tasks
 BEGIN
   UPDATE tasks SET updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime') WHERE id = OLD.id;
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS task_tags (
   CONSTRAINT task_tags_tag_id_tags_id_fk FOREIGN KEY (tag_id) REFERENCES tags(id)
 );
 
-CREATE TRIGGER set_tasks_tags_updated_at
+CREATE TRIGGER IF NOT EXISTS set_tasks_tags_updated_at
 BEFORE UPDATE ON task_tags
 BEGIN
   UPDATE task_tags SET updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime') WHERE id = OLD.id;
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS tags (
   updated_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime'))
 );
 
-CREATE TRIGGER set_tags_updated_at
+CREATE TRIGGER IF NOT EXISTS set_tags_updated_at
 BEFORE UPDATE ON tags
 BEGIN
   UPDATE tags SET updated_at = strftime('%Y-%m-%d %H:%M:%f', 'now', 'localtime') WHERE id = OLD.id;
