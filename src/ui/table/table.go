@@ -1,6 +1,8 @@
 package table
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/table"
 	tbl "github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
@@ -9,7 +11,8 @@ import (
 )
 
 type tableArea struct {
-	isOK bool
+	isOK        bool
+	selectedRow Row
 }
 
 func New() *tableArea {
@@ -20,16 +23,26 @@ func (ta *tableArea) IsOK() bool {
 	return ta.isOK
 }
 
+func (ta *tableArea) SelectedRow() Row {
+	return ta.selectedRow
+}
+
 type Column struct {
 	Title string
 	Width int
 }
 
-type Row []string
+type Row struct {
+	Index int
+	Body  []string
+}
 
-func (ta *tableArea) Open(tableAreaTitle string, cols []Column, rs []Row) error {
+func (ta *tableArea) Open(title string, cols []Column, rs []Row) error {
+	fmt.Println("")
+	fmt.Printf(" %s ", title)
+	fmt.Println("")
 	columns := lo.Map(cols, func(p Column, _ int) tbl.Column { return tbl.Column{Title: p.Title, Width: p.Width} })
-	rows := lo.Map(rs, func(r Row, _ int) tbl.Row { return tbl.Row(r) })
+	rows := lo.Map(rs, func(r Row, _ int) tbl.Row { return tbl.Row(r.Body) })
 
 	t := tbl.New(
 		tbl.WithColumns(columns),
@@ -41,12 +54,13 @@ func (ta *tableArea) Open(tableAreaTitle string, cols []Column, rs []Row) error 
 	s := table.DefaultStyles()
 	s.Header = s.Header.
 		BorderStyle(lipgloss.NormalBorder()).
-		BorderForeground(lipgloss.Color("240")).
+		BorderForeground(lipgloss.Color("#ffffff")).
 		BorderBottom(true).
+		Padding(0, 1).
 		Bold(true)
 	s.Selected = s.Selected.
-		Foreground(lipgloss.Color("229")).
-		Background(lipgloss.Color("57")).
+		Foreground(lipgloss.Color("#ffffff")).
+		Background(lipgloss.Color("#037d9d")).
 		Bold(true)
 	t.SetStyles(s)
 	p := tea.NewProgram(model{table: t})
@@ -54,7 +68,12 @@ func (ta *tableArea) Open(tableAreaTitle string, cols []Column, rs []Row) error 
 	if err != nil {
 		return err
 	}
+
 	ta.isOK = m.(model).isOK
+	if ta.isOK {
+		row := m.(model).table.SelectedRow()
+		ta.selectedRow = Row{Index: m.(model).table.Cursor(), Body: row}
+	}
 	return nil
 }
 
@@ -84,6 +103,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "enter":
 			m.isOK = true
+
 			return m, tea.Quit
 		}
 	}

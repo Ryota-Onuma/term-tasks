@@ -6,15 +6,12 @@ import (
 
 	"github.com/charmbracelet/bubbles/progress"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 const (
 	padding  = 2
 	maxWidth = 80
 )
-
-var helpStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFF00")).Render
 
 type progressBar struct{}
 
@@ -76,8 +73,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m model) View() string {
 	pad := strings.Repeat(" ", padding)
 	return "\n" +
-		pad + m.progress.View() + "\n\n" +
-		pad + helpStyle("Press any key to quit")
+		pad + m.progress.View() + "\n\n"
 }
 
 func tickCmd() tea.Cmd {

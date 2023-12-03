@@ -110,13 +110,10 @@ const listTasks = `-- name: ListTasks :many
 SELECT 
   tasks.id, tasks.title, tasks.detail, tasks.status, tasks.priority, tasks.created_at, tasks.updated_at, tasks.dead_line_at, 
   master_task_states.label AS task_state_label, 
-  master_task_priorities.label AS task_priority_label,
-  tags.name AS tag_name 
+  master_task_priorities.label AS task_priority_label
 FROM tasks
 INNER JOIN master_task_states ON tasks.status = master_task_states.value
 INNER JOIN master_task_priorities ON tasks.priority = master_task_priorities.value
-LEFT OUTER JOIN task_tags ON tasks.id = task_tags.task_id
-LEFT OUTER JOIN tags ON task_tags.tag_id = tags.id
 ORDER BY master_task_priorities.display_order ASC, tasks.created_at DESC
 `
 
@@ -131,7 +128,6 @@ type ListTasksRow struct {
 	DeadLineAt        sql.NullString
 	TaskStateLabel    string
 	TaskPriorityLabel string
-	TagName           sql.NullString
 }
 
 func (q *Queries) ListTasks(ctx context.Context) ([]ListTasksRow, error) {
@@ -154,7 +150,6 @@ func (q *Queries) ListTasks(ctx context.Context) ([]ListTasksRow, error) {
 			&i.DeadLineAt,
 			&i.TaskStateLabel,
 			&i.TaskPriorityLabel,
-			&i.TagName,
 		); err != nil {
 			return nil, err
 		}

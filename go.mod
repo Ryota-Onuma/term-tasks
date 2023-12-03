@@ -1,4 +1,4 @@
-module github.com/Ryota-Onuma/todo-app
+module github.com/Ryota-Onuma/terminal-task-manager
 
 go 1.21
 

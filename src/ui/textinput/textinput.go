@@ -20,12 +20,17 @@ func (t *textInput) Text() string {
 	return t.txt
 }
 
+func (t *textInput) SetText(txt string) *textInput {
+	t.txt = txt
+	return t
+}
+
 func (t *textInput) Open(textInputTitle string) error {
 	if textInputTitle == "" {
 		textInputTitle = "Enter text: "
 	}
 	// 全画面表示
-	p := tea.NewProgram(initialModel(textInputTitle), tea.WithAltScreen())
+	p := tea.NewProgram(t.initialModel(textInputTitle), tea.WithAltScreen())
 	m, err := p.Run()
 	if err != nil {
 		return err
@@ -50,11 +55,14 @@ type model struct {
 	err            error
 }
 
-func initialModel(textInputTitle string) model {
+func (t *textInput) initialModel(textInputTitle string) model {
 	ti := textinput.New()
 	ti.Focus()
 	ti.CharLimit = 156
 	ti.Width = 20
+	if t.txt != "" {
+		ti.SetValue(t.txt)
+	}
 
 	return model{
 		textInput:      ti,

@@ -1,7 +1,7 @@
 package tasks
 
 import (
-	"github.com/Ryota-Onuma/todo-app/db/generated/queries"
+	"github.com/Ryota-Onuma/terminal-task-manager/db/generated/queries"
 )
 
 type task struct {

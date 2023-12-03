@@ -10,6 +10,7 @@ import (
 	l "github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/samber/lo"
 )
 
 type listInput struct {
@@ -20,13 +21,18 @@ func New() *listInput {
 	return &listInput{}
 }
 
+func (t *listInput) SetText(txt string) *listInput {
+	t.txt = txt
+	return t
+}
+
 func (t *listInput) Text() string {
 	return t.txt
 }
 
 func (t *listInput) Open(listTitle string, items []Item) error {
 	if len(items) == 0 {
-		return errors.New("No items")
+		return errors.New("no items")
 	}
 
 	var litems []l.Item
@@ -43,6 +49,14 @@ func (t *listInput) Open(listTitle string, items []Item) error {
 	l.Styles.Title = titleStyle
 	l.Styles.PaginationStyle = paginationStyle
 	l.Styles.HelpStyle = helpStyle
+
+	if t.txt != "" {
+		_, index, ok := lo.FindIndexOf(items, func(i Item) bool { return i.Title() == t.txt })
+		if !ok {
+			return fmt.Errorf("item not found: %s", t.txt)
+		}
+		l.Select(index)
+	}
 	p := tea.NewProgram(model{list: l}, tea.WithAltScreen())
 	m, err := p.Run()
 	if err != nil {
@@ -54,8 +68,6 @@ func (t *listInput) Open(listTitle string, items []Item) error {
 
 	return nil
 }
-
-var docStyle = lipgloss.NewStyle().Margin(1, 2)
 
 type Item struct {
 	title string
@@ -76,7 +88,6 @@ var (
 	selectedItemStyle = lipgloss.NewStyle().PaddingLeft(2).Foreground(lipgloss.Color("170"))
 	paginationStyle   = list.DefaultStyles().PaginationStyle.PaddingLeft(4)
 	helpStyle         = list.DefaultStyles().HelpStyle.PaddingLeft(4).PaddingBottom(1)
-	quitTextStyle     = lipgloss.NewStyle().Margin(1, 0, 2, 4)
 )
 
 type itemDelegate struct{}

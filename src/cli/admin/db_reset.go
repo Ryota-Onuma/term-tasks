@@ -2,10 +2,8 @@ package admin
 
 import (
 	"context"
-	"errors"
+	_ "embed"
 	"fmt"
-	"os"
-	"path"
 )
 
 func (a *admin) ResetDB(ctx context.Context) error {
@@ -25,11 +23,7 @@ func (a *admin) ResetDB(ctx context.Context) error {
 }
 
 func (a *admin) DropDB(ctx context.Context) error {
-	ddlFile, ok := os.LookupEnv("DROP_DDL_SQL_FILE")
-	if !ok {
-		return errors.New("DROP_DDL_SQL_FILE is not set")
-	}
-	ddl, err := os.ReadFile(ddlFile)
+	ddl, err := a.schemaFiles.ReadFile("db/schema/drop.sql")
 	if err != nil {
 		return err
 	}
@@ -42,11 +36,7 @@ func (a *admin) DropDB(ctx context.Context) error {
 }
 
 func (a *admin) MigrateDB(ctx context.Context) error {
-	ddlFile, ok := os.LookupEnv("MIGRATE_DDL_SQL_FILE")
-	if !ok {
-		return errors.New("MIGRATE_DDL_SQL_FILE is not set")
-	}
-	ddl, err := os.ReadFile(ddlFile)
+	ddl, err := a.schemaFiles.ReadFile("db/schema/schema.sql")
 	if err != nil {
 		return err
 	}
@@ -59,23 +49,28 @@ func (a *admin) MigrateDB(ctx context.Context) error {
 }
 
 func (a *admin) Seed(ctx context.Context) error {
-	masterDataDirPath, ok := os.LookupEnv("MASTER_SEED_SQL_DIR_PATH")
-	if !ok {
-		return errors.New("MASTER_SEED_SQL_DIR_PATH is not set")
-	}
-	if err := a.applySeed(ctx, masterDataDirPath); err != nil {
+	masterDataSqls, err := a.getMasterDataSqls()
+	if err != nil {
 		return err
 	}
+	for _, sql := range masterDataSqls {
+		if err := a.applySeed(ctx, sql); err != nil {
+			return fmt.Errorf("failed to apply master seed: %w", err)
+		}
+	}
+
 	fmt.Println("")
 	fmt.Println("Applied master seed!!")
 	fmt.Println("")
 
-	localDataDirPath, ok := os.LookupEnv("LOCAL_SEED_SQL_DIR_PATH")
-	if !ok {
-		return errors.New("LOCAL_SEED_SQL_DIR_PATH is not set")
-	}
-	if err := a.applySeed(ctx, localDataDirPath); err != nil {
+	localDataSqls, err := a.getLocalDataSqls()
+	if err != nil {
 		return err
+	}
+	for _, sql := range localDataSqls {
+		if err := a.applySeed(ctx, sql); err != nil {
+			return fmt.Errorf("failed to apply local seed: %w", err)
+		}
 	}
 
 	fmt.Println("")
@@ -85,36 +80,42 @@ func (a *admin) Seed(ctx context.Context) error {
 	return nil
 }
 
-func (a *admin) applySeed(ctx context.Context, dirPath string) error {
-	files, err := os.ReadDir(dirPath)
+func (a *admin) getMasterDataSqls() ([]string, error) {
+	files, err := a.masterDataFiles.ReadDir("db/seeds/master")
 	if err != nil {
-		return err
+		return nil, err
 	}
-	for _, file := range files {
-		if file.IsDir() {
-			return fmt.Errorf("%s is not a file", file.Name())
-		}
-		filePath := path.Join(dirPath, file.Name())
-		sql, err := os.ReadFile(filePath)
-		if err != nil {
-			return err
-		}
 
-		if _, err := a.DB().ExecContext(ctx, string(sql)); err != nil {
-			return fmt.Errorf("failed to apply seed: %s, err: %w", filePath, err)
+	var sqls []string
+	for _, file := range files {
+		sqlByte, err := a.masterDataFiles.ReadFile("db/seeds/master/" + file.Name())
+		if err != nil {
+			return nil, err
 		}
-		fmt.Println("Applied seed: ", filePath)
+		sqls = append(sqls, string(sqlByte))
 	}
-	return nil
+	return sqls, nil
 }
 
-// 生のSQLを実行する
-func (a *admin) Exec(ctx context.Context, sql string) error {
-	res, err := a.DB().QueryContext(ctx, sql)
+func (a *admin) getLocalDataSqls() ([]string, error) {
+	files, err := a.localDataFiles.ReadDir("db/seeds/local")
 	if err != nil {
+		return nil, err
+	}
+	var sqls []string
+	for _, file := range files {
+		sqlByte, err := a.localDataFiles.ReadFile("db/seeds/local/" + file.Name())
+		if err != nil {
+			return nil, err
+		}
+		sqls = append(sqls, string(sqlByte))
+	}
+	return sqls, nil
+}
+
+func (a *admin) applySeed(ctx context.Context, sql string) error {
+	if _, err := a.DB().ExecContext(ctx, sql); err != nil {
 		return err
 	}
-	fmt.Println("Executed SQL: ", sql)
-	fmt.Println("Result: ", *res)
 	return nil
 }

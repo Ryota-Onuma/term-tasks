@@ -2,23 +2,32 @@ package cli
 
 import (
 	"database/sql"
+	"embed"
 	"fmt"
 
-	"github.com/Ryota-Onuma/todo-app/db/generated/queries"
-	"github.com/Ryota-Onuma/todo-app/src/cli/admin"
-	"github.com/Ryota-Onuma/todo-app/src/cli/tasks"
+	"github.com/Ryota-Onuma/terminal-task-manager/db/generated/queries"
+	"github.com/Ryota-Onuma/terminal-task-manager/src/cli/admin"
+	"github.com/Ryota-Onuma/terminal-task-manager/src/cli/tasks"
+
+	_ "embed"
 
 	c "github.com/urfave/cli/v2"
 )
 
 type Cli struct {
-	app *c.App
+	app             *c.App
+	schemaFiles     embed.FS
+	masterDataFiles embed.FS
+	localDataFiles  embed.FS
 }
 
-func New(db *sql.DB) *Cli {
+func New(db *sql.DB, schemaFiles, masterDataFiles, localDataFiles embed.FS) *Cli {
 	q := queries.New(db)
 	return &Cli{
-		app: registerApp(db, q),
+		app:             registerApp(db, q, schemaFiles, masterDataFiles, localDataFiles),
+		schemaFiles:     schemaFiles,
+		masterDataFiles: masterDataFiles,
+		localDataFiles:  localDataFiles,
 	}
 }
 
@@ -26,11 +35,11 @@ func (c *Cli) Run(args []string) error {
 	return c.app.Run(args)
 }
 
-func registerApp(db *sql.DB, q *queries.Queries) *c.App {
+func registerApp(db *sql.DB, q *queries.Queries, schemaFiles, masterDataFiles, localDataFiles embed.FS) *c.App {
 	return &c.App{
 		Commands: []*c.Command{
 			registerTasks(q),
-			registerAdmin(db),
+			registerAdmin(db, schemaFiles, masterDataFiles, localDataFiles),
 			registerVersion(),
 		},
 	}
@@ -98,9 +107,9 @@ func registerTasks(q *queries.Queries) *c.Command {
 	}
 }
 
-func registerAdmin(db *sql.DB) *c.Command {
-	adminTask := admin.New(db)
-	var adminResetDB, adminMigrateDB, adminSeed, execSql c.ActionFunc
+func registerAdmin(db *sql.DB, schemaFiles, masterDataFiles, localDataFiles embed.FS) *c.Command {
+	adminTask := admin.New(db, schemaFiles, masterDataFiles, localDataFiles)
+	var adminResetDB, adminMigrateDB, adminSeed c.ActionFunc
 	adminResetDB = func(cCtx *c.Context) error {
 		if err := adminTask.ResetDB(cCtx.Context); err != nil {
 			return err
@@ -120,13 +129,6 @@ func registerAdmin(db *sql.DB) *c.Command {
 		return nil
 	}
 
-	execSql = func(cCtx *c.Context) error {
-		sql := cCtx.Args().First()
-		if err := adminTask.Exec(cCtx.Context, sql); err != nil {
-			return err
-		}
-		return nil
-	}
 	return &c.Command{
 		Name:  "admin",
 		Usage: "manage admin tasks",
@@ -149,11 +151,6 @@ func registerAdmin(db *sql.DB) *c.Command {
 						Name:   "seed",
 						Usage:  "seed database",
 						Action: adminSeed,
-					},
-					{
-						Name:   "exec",
-						Usage:  "exec sql",
-						Action: execSql,
 					},
 				},
 			},

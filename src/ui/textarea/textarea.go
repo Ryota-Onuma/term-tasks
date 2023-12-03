@@ -14,6 +14,10 @@ type textArea struct {
 func New() *textArea {
 	return &textArea{}
 }
+func (t *textArea) SetText(txt string) *textArea {
+	t.txt = txt
+	return t
+}
 
 func (t *textArea) Text() string {
 	return t.txt
@@ -24,7 +28,7 @@ func (t *textArea) Open(textAreaTitle string) error {
 		textAreaTitle = "Enter text below..."
 	}
 	// 全画面表示
-	p := tea.NewProgram(initialModel(textAreaTitle), tea.WithAltScreen())
+	p := tea.NewProgram(t.initialModel(textAreaTitle), tea.WithAltScreen())
 
 	m, err := p.Run()
 	if err != nil {
@@ -46,11 +50,14 @@ type model struct {
 	err           error
 }
 
-func initialModel(textAreaTitle string) model {
+func (t *textArea) initialModel(textAreaTitle string) model {
 	ti := textarea.New()
 	ti.ShowLineNumbers = false
 
 	ti.Focus()
+	if t.txt != "" {
+		ti.SetValue(t.txt)
+	}
 
 	return model{
 		textAreaTitle: textAreaTitle,

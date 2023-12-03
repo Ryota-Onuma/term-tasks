@@ -7,12 +7,12 @@ import (
 
 	"github.com/samber/lo"
 
-	"github.com/Ryota-Onuma/todo-app/db/generated/queries"
-	"github.com/Ryota-Onuma/todo-app/src/ui/list"
-	"github.com/Ryota-Onuma/todo-app/src/ui/progress"
-	"github.com/Ryota-Onuma/todo-app/src/ui/table"
-	"github.com/Ryota-Onuma/todo-app/src/ui/textarea"
-	"github.com/Ryota-Onuma/todo-app/src/ui/textinput"
+	"github.com/Ryota-Onuma/terminal-task-manager/db/generated/queries"
+	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/list"
+	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/progress"
+	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/table"
+	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/textarea"
+	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/textinput"
 )
 
 func (t *task) Add(ctx context.Context) error {
@@ -71,9 +71,12 @@ func (t *task) Add(ctx context.Context) error {
 		{Title: "Priority", Width: 20},
 	}
 	rows := []table.Row{
-		{title.Text(), detail.Text(), status.Text(), priority.Text()},
+		{
+			Index: 0,
+			Body:  []string{title.Text(), detail.Text(), status.Text(), priority.Text()},
+		},
 	}
-	if err := tbl.Open("ALL TASKS", columns, rows); err != nil {
+	if err := tbl.Open("Confirm and go ahead.", columns, rows); err != nil {
 		return nil
 	}
 	if !tbl.IsOK() {
@@ -93,7 +96,7 @@ func (t *task) Add(ctx context.Context) error {
 	// 雰囲気を出すためのProgressBar。実際には何もしていない。
 	progressBar := progress.New()
 	if err := progressBar.Open(); err != nil {
-		return errors.New("Something went wrong in progress bar, but don't worry. Task is already added to the database.")
+		return errors.New("something went wrong in progress bar, but don't worry. Task is already added to the database")
 	}
 
 	return nil
