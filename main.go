@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"embed"
+	"fmt"
 	"log"
 	"os"
 
@@ -23,7 +24,7 @@ var masterDataFiles embed.FS
 var localDataFiles embed.FS
 
 func main() {
-	const sqliteFileDir = "~/.term-tasks/db/"
+	const sqliteFileDir = ".term-tasks/db/"
 	const sqliteFile = sqliteFileDir + "db.sqlite3"
 	// sqliteFileがなかったら作成する
 	if _, err := os.Stat(sqliteFile); os.IsNotExist(err) {
@@ -33,6 +34,7 @@ func main() {
 		if _, err := os.Create(sqliteFile); err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("📁 Created " + sqliteFileDir)
 	}
 	db, err := sql.Open("sqlite3", sqliteFile)
 	if err != nil {
