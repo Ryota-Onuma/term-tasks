@@ -57,6 +57,7 @@ func registerVersion() *c.Command {
 		Action: versionFunc,
 	}
 }
+
 func registerInit(sqlDB *sql.DB, schemaFiles, masterDataFiles, localDataFiles embed.FS) *c.Command {
 	dbAdmin := db.New(sqlDB, schemaFiles, masterDataFiles, localDataFiles)
 	return &c.Command{

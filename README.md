@@ -11,18 +11,19 @@ You can create, list, edit, and delete your tasks with easy ways.
 - [sqlc](https://sqlc.dev/)
 - [SQLite](https://www.sqlite.org/index.html)
 - [Bubble Tea](https://github.com/charmbracelet/bubbletea)
+- [urfave/cli](https://github.com/urfave/cli)
 
 ## 🚀 Install
 
 ```sh
-go install github.com/Ryota-Onuma/term-tasks@latest
+$ go install github.com/Ryota-Onuma/term-tasks@latest
 ```
 
 ## 💡 Usage
 
 If you want to know shorthands, try `--help`.
 
-### 🙈 Show your Term Tasks version.
+### 🙈 Show version
 
 ```sh
 $ term-task version
