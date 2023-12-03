@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -24,17 +25,21 @@ var masterDataFiles embed.FS
 var localDataFiles embed.FS
 
 func main() {
-	const sqliteFileDir = "~/.term-tasks/db/"
-	const sqliteFile = sqliteFileDir + "db.sqlite3"
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		log.Fatal(err)
+	}
+	dbDirPath := filepath.Join(homeDir, ".term-tasks", "db")
+	sqliteFile := filepath.Join(dbDirPath, "db.sqlite3")
 	// sqliteFileがなかったら作成する
 	if _, err := os.Stat(sqliteFile); os.IsNotExist(err) {
-		if err := os.MkdirAll(sqliteFileDir, 0755); err != nil {
+		if err := os.MkdirAll(dbDirPath, 0755); err != nil {
 			log.Fatal(err)
 		}
 		if _, err := os.Create(sqliteFile); err != nil {
 			log.Fatal(err)
 		}
-		fmt.Println("📁 Created " + sqliteFileDir)
+		fmt.Println("📁 Created " + sqliteFile)
 	}
 	db, err := sql.Open("sqlite3", sqliteFile)
 	if err != nil {
