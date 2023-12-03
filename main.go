@@ -10,7 +10,7 @@ import (
 
 	_ "embed"
 
-	"github.com/Ryota-Onuma/terminal-task-manager/src/cli"
+	"github.com/Ryota-Onuma/term-tasks/src/cli"
 )
 
 //go:embed db/schema/*.sql
@@ -23,7 +23,7 @@ var masterDataFiles embed.FS
 var localDataFiles embed.FS
 
 func main() {
-	const sqliteFileDir = "tmp/terminal-task-manager/"
+	const sqliteFileDir = "tmp/term-tasks/"
 	const sqliteFile = sqliteFileDir + "db.sqlite3"
 	// sqliteFileがなかったら作成する
 	if _, err := os.Stat(sqliteFile); os.IsNotExist(err) {

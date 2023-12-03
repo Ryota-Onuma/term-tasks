@@ -1,4 +1,4 @@
-module github.com/Ryota-Onuma/terminal-task-manager
+module github.com/Ryota-Onuma/term-tasks
 
 go 1.21
 

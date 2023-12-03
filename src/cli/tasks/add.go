@@ -7,12 +7,12 @@ import (
 
 	"github.com/samber/lo"
 
-	"github.com/Ryota-Onuma/terminal-task-manager/db/generated/queries"
-	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/list"
-	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/progress"
-	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/table"
-	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/textarea"
-	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/textinput"
+	"github.com/Ryota-Onuma/term-tasks/db/generated/queries"
+	"github.com/Ryota-Onuma/term-tasks/src/ui/list"
+	"github.com/Ryota-Onuma/term-tasks/src/ui/progress"
+	"github.com/Ryota-Onuma/term-tasks/src/ui/table"
+	"github.com/Ryota-Onuma/term-tasks/src/ui/textarea"
+	"github.com/Ryota-Onuma/term-tasks/src/ui/textinput"
 )
 
 func (t *task) Add(ctx context.Context) error {

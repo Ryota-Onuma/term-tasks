@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/Ryota-Onuma/terminal-task-manager/db/generated/queries"
-	"github.com/Ryota-Onuma/terminal-task-manager/src/ui/table"
+	"github.com/Ryota-Onuma/term-tasks/db/generated/queries"
+	"github.com/Ryota-Onuma/term-tasks/src/ui/table"
 )
 
 func (t *task) List(ctx context.Context) error {

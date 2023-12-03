@@ -5,9 +5,9 @@ import (
 	"embed"
 	"fmt"
 
-	"github.com/Ryota-Onuma/terminal-task-manager/db/generated/queries"
-	"github.com/Ryota-Onuma/terminal-task-manager/src/cli/admin"
-	"github.com/Ryota-Onuma/terminal-task-manager/src/cli/tasks"
+	"github.com/Ryota-Onuma/term-tasks/db/generated/queries"
+	"github.com/Ryota-Onuma/term-tasks/src/cli/admin"
+	"github.com/Ryota-Onuma/term-tasks/src/cli/tasks"
 
 	_ "embed"
 
