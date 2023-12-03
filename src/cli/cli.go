@@ -2,6 +2,7 @@ package cli
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/Ryota-Onuma/todo-app/db/generated/queries"
 	"github.com/Ryota-Onuma/todo-app/src/cli/admin"
@@ -30,13 +31,26 @@ func registerApp(db *sql.DB, q *queries.Queries) *c.App {
 		Commands: []*c.Command{
 			registerTasks(q),
 			registerAdmin(db),
+			registerVersion(),
 		},
+	}
+}
+
+func registerVersion() *c.Command {
+	var versionFunc c.ActionFunc = func(cCtx *c.Context) error {
+		fmt.Println(version)
+		return nil
+	}
+	return &c.Command{
+		Name:   "version",
+		Usage:  "show version",
+		Action: versionFunc,
 	}
 }
 
 func registerTasks(q *queries.Queries) *c.Command {
 	task := tasks.New(q)
-	var taskList, taskAdd c.ActionFunc
+	var taskList, taskAdd, taskEdit c.ActionFunc
 	taskList = func(cCtx *c.Context) error {
 		if err := task.List(cCtx.Context); err != nil {
 			return err
@@ -45,6 +59,12 @@ func registerTasks(q *queries.Queries) *c.Command {
 	}
 	taskAdd = func(cCtx *c.Context) error {
 		if err := task.Add(cCtx.Context); err != nil {
+			return err
+		}
+		return nil
+	}
+	taskEdit = func(cCtx *c.Context) error {
+		if err := task.Edit(cCtx.Context); err != nil {
 			return err
 		}
 		return nil
@@ -62,12 +82,17 @@ func registerTasks(q *queries.Queries) *c.Command {
 				Usage:   "list tasks",
 				Action:  taskList,
 			},
-
 			{
 				Name:    "add",
 				Aliases: []string{"a"},
 				Usage:   "add a task",
 				Action:  taskAdd,
+			},
+			{
+				Name:    "edit",
+				Aliases: []string{"e"},
+				Usage:   "edit a task",
+				Action:  taskEdit,
 			},
 		},
 	}

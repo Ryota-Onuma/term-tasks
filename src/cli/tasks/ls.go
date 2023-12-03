@@ -16,7 +16,7 @@ func (t *task) List(ctx context.Context) error {
 	tbl := table.New()
 	columns := []table.Column{
 		{Title: "Title", Width: 20},
-		{Title: "Detail", Width: 20},
+		{Title: "Detail", Width: 40},
 		{Title: "Status", Width: 10},
 		{Title: "Priority", Width: 20},
 	}
