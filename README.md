@@ -26,14 +26,14 @@ If you want to know shorthands, try `--help`.
 ### 🙈 Show version
 
 ```sh
-$ term-task version
+$ term-tasks version
 v0.0.1
 ```
 
 ### 🙏 Initialization
 
 ```sh
-$ term-task init
+$ term-tasks init
 ```
 
 ### 🌱 Apply sample data
@@ -41,7 +41,7 @@ $ term-task init
 If you want to try `Term Tasks`, it's recommended to execute this command.
 
 ```sh
-$ term-task db seed
+$ term-tasks db seed
 ```
 
 ### 😭 DB Reset
@@ -49,17 +49,17 @@ $ term-task db seed
 ※ All your tasks will be deleted.
 
 ```sh
-$ term-task db reset
+$ term-tasks db reset
 ```
 
 ### ✅ Add your task
 ```sh
-$ term-task tasks add
+$ term-tasks tasks add
 ```
 
 ### 📃 List your tasks
 ```sh
-$ term-task tasks list
+$ term-tasks tasks list
 ```
 
 ### ✏️ Edit your tasks
